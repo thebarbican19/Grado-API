@@ -211,7 +211,7 @@ function tags_produce($text) {
 			
 	$tags_rating = tags_rating($text);
 	$tags_rating_positivity = $tags_rating['positivity_rating'];
-	$tags_rating_expletive = $tags_rating['expletive_rating'];
+	$tags_rating_expletive = $tags_rating['expletive_count'];
 	foreach ($tags_output as $key => $row) {
 		$tags_sort[$key] = $row['count'];
 		
@@ -227,12 +227,16 @@ function tags_produce($text) {
 }
 
 function tags_requested($text, $tags) {
+	global $database_grado_connect;
+	
 	$request_tags = implode(",", $tags);
 	$request_post = mysqli_query($database_grado_connect, "INSERT INTO `gradtag`.`requests` (`request_id`, `request_timestamp`, `request_body`, `request_tags`, `request_app`, `request_ip`, `request_country`) VALUES (NULL, CURRENT_TIMESTAMP, '$text', '$request_tags', '$session_application', '$session_ip', '$session_country');");
 	
 }
 
-function tags_rating($text) {	
+function tags_rating($text) {
+	global $database_grado_connect;
+	
 	$text_remove = tags_exclude();	
 	$text_format = preg_replace('/[^a-zA-Z\d -]+/i', '', $text);
 	$text_format = strtolower($text_format);
@@ -267,9 +271,8 @@ function tags_rating($text) {
 	}
 	
 	$rating_positivity_score = round(($rating_positive / ($rating_positive + $rating_negative)) * 100);
-	$rating_expletive_score = round(($rating_expletive_count / $text_count) * 100);
 	
-	return array("positivity_rating" => $rating_positivity_score, "expletive_rating" => $rating_expletive_score);
+	return array("positivity_rating" => $rating_positivity_score, "expletive_count" => $rating_expletive_count);
 	
 }
 
@@ -327,6 +330,8 @@ function tag_rules($catgory, $subcatagorys, $tags, $typecount, $existing) {
 }
 
 function tags_stats() {
+	global $database_grado_connect;
+		
 	$stats_requested = mysqli_query($database_grado_connect ,"SELECT `request_timestamp`,`request_ip`,`request_country` FROM `requests` WHERE `request_app` LIKE '$session_application'");
 	$stats_request_count = mysqli_num_rows($stats_requested);
 	
@@ -359,6 +364,8 @@ function tags_stats() {
 }
 
 function tags_upload($tags, $catagory) {
+	global $database_grado_connect;
+		
 	foreach ($tags as $tag) {
 		$trending_upload_count = 5;
 		$trending_tag = strtolower($tag);
@@ -428,6 +435,8 @@ function tags_upload($tags, $catagory, $channel) {
 */
 
 function tag_channel_create($tag, $catagory) {
+	global $database_grado_connect;
+		
 	$channel_query = mysqli_query($database_grado_connect, "SELECT * FROM `channel` WHERE `channel_title` LIKE '$tag' LIMIT 0 ,1");
 	$channel_exists = mysqli_num_rows($channel_query);
 	if ($channel_exists == 0) {
