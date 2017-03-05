@@ -37,8 +37,8 @@ if ($passed_method == 'GET') {
 		
 	}	
 	else {
-		$username_query = mysql_query("SELECT * FROM `users` WHERE `user_name` LIKE '$passed_username' LIMIT 0, 1");
-		$username_exists = mysql_num_rows($username_query);
+		$username_query = mysqli_query($database_grado_connect, "SELECT * FROM `users` WHERE `user_name` LIKE '$passed_username' LIMIT 0, 1");
+		$username_exists = mysqli_num_rows($username_query);
 		if ($username_exists == 0) {
 			$json_status = 'username is fair game';
 			$json_output[] = array('status' => $json_status, 'error_code' => '200');

@@ -21,6 +21,8 @@ function tags_popularity($text, $limit) {
 }
 
 function tags_produce($text) {		
+	global $database_grado_connect;
+	
 	$text_format = html_entity_decode($text, ENT_QUOTES);
 	$text_format = strip_tags($text_format);
 	$text_format = trim($text_format);

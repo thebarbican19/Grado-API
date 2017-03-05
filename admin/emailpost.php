@@ -44,7 +44,7 @@ if ($passed_method == 'POST') {
 	}
 	else {
 		$json_status = 'user does not have the privileges to access this api';
-		$json_output[] = array('status' => $json_status, 'error_code' => 401, 'ip_address' => $session_ip);
+		$json_output[] = array('status' => $json_status, 'error_code' => 401);
 		echo json_encode($json_output);
 		exit;
 		

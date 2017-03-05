@@ -6,8 +6,6 @@ include '../lib/analytics.php';
 
 header('Content-Type: application/json');
 
-global $database_grado_connect;
-		
 $passed_method = $_SERVER['REQUEST_METHOD'];
 $passed_data = json_decode(file_get_contents('php://input'), true);
 $passed_email = $passed_data['email'];

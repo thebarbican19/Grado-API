@@ -51,7 +51,7 @@ function channel_output_extended($data) {
 
 function channel_subscribed($user,$subscription) {
 	$subscription_query = mysqli_query("SELECT * FROM `subscriptions` WHERE `subscription_user` LIKE  '$user' AND `subscription_channel` LIKE '$subscription' LIMIT 0 ,1");
-	$subscription_bool = mysql_num_rows($subscription_query);
+	$subscription_bool = mysqli_num_rows($subscription_query);
 	
 	return $subscription_bool;
 	

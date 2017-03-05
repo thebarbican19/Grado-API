@@ -73,7 +73,7 @@ function return_stats($item) {
 		$analytics_view_query = mysqli_query("SELECT * FROM `views` WHERE `view_content` LIKE '$item'");
 		$analytics_view_count = mysqli_num_rows($analytics_view_query);	
 		$analytics_view_total = 0;
-		while($row = mysql_fetch_array($analytics_view_query)) {	
+		while($row = mysqli_fetch_array($analytics_view_query)) {	
 			$analytics_view_total =+ (int)$row['view_count'];
 		}	
 						

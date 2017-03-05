@@ -44,9 +44,9 @@ if ($passed_method == 'GET') {
 		$passed_types_injection .= ") ";
 		
 		if (in_array("featured", $passed_sections)) {
-			$featured_query = mysql_query("SELECT `channel_key`, `channel_title`, `channel_type`, `channel_updated`, `channel_description`, `channel_header`, `channel_hidden`, `channel_verified` FROM channel WHERE (`channel_type` LIKE 'staff' OR `channel_verified` = 1) AND `channel_type` NOT LIKE 'local' AND `channel_hidden` = 0 ORDER BY channel_timestamp DESC LIMIT 0, 5");
-			$featured_count = mysql_num_rows($featured_query);
-			while($row = mysql_fetch_array($featured_query)) {
+			$featured_query = mysqli_query($database_grado_connect, "SELECT `channel_key`, `channel_title`, `channel_type`, `channel_updated`, `channel_description`, `channel_header`, `channel_hidden`, `channel_verified` FROM channel WHERE (`channel_type` LIKE 'staff' OR `channel_verified` = 1) AND `channel_type` NOT LIKE 'local' AND `channel_hidden` = 0 ORDER BY channel_timestamp DESC LIMIT 0, 5");
+			$featured_count = mysqli_num_rows($featured_query);
+			while($row = mysqli_fetch_array($featured_query)) {
 				//$exists_injection .= " AND `channel_key` NOT LIKE '" . $row['channel_key'] . "'";	
 				$featured_output[] = channel_output($row);
 				
@@ -57,9 +57,9 @@ if ($passed_method == 'GET') {
 		}
 		
 		if (in_array("subscriptions", $passed_sections) && isset($authuser_key)) {
-			$subscriptions_query = mysql_query("SELECT `subscription_id`, `subscription_user` ,`subscription_channel`, `channel_key`, `channel_title`, `channel_type`, `channel_updated`, `channel_description`, `channel_header`, `channel_hidden`, `channel_verified`, COUNT(*) AS subscription_count FROM subscriptions LEFT JOIN channel on subscriptions.subscription_channel LIKE channel.channel_key WHERE `subscription_user` LIKE '$authuser_key' AND `channel_hidden` = 0 $passed_types_injection $exists_injection ORDER BY channel_updated DESC LIMIT 0, 100");
-			$subscriptions_count = mysql_num_rows($subscriptions_query);
-			while($row = mysql_fetch_array($subscriptions_query)) {	
+			$subscriptions_query = mysqli_query($database_grado_connect, "SELECT `subscription_id`, `subscription_user` ,`subscription_channel`, `channel_key`, `channel_title`, `channel_type`, `channel_updated`, `channel_description`, `channel_header`, `channel_hidden`, `channel_verified`, COUNT(*) AS subscription_count FROM subscriptions LEFT JOIN channel on subscriptions.subscription_channel LIKE channel.channel_key WHERE `subscription_user` LIKE '$authuser_key' AND `channel_hidden` = 0 $passed_types_injection $exists_injection ORDER BY channel_updated DESC LIMIT 0, 100");
+			$subscriptions_count = mysqli_num_rows($subscriptions_query);
+			while($row = mysqli_fetch_array($subscriptions_query)) {	
 				//$exists_injection .= " AND `channel_key` NOT LIKE '" . $row['channel_key'] . "'";		
 				$subscribers_output[] = channel_output($row);
 				
@@ -84,9 +84,9 @@ if ($passed_method == 'GET') {
 			
 			$tailored_injection .= ") ";
 			
-			$tailored_query = mysql_query("SELECT `subscription_id`, `subscription_channel`, `channel_key`, `channel_title`, `channel_type`, `channel_updated`, `channel_description`, `channel_header`, `channel_hidden`, `channel_verified`, COUNT(*) AS subscription_count FROM subscriptions RIGHT JOIN channel on subscriptions.subscription_channel LIKE channel.channel_key WHERE `channel_hidden` = 0 $passed_types_injection $exists_injection $tailored_injection GROUP BY subscription_channel ORDER BY subscription_count DESC, channel_updated DESC LIMIT 0, 100");
-			$tailored_count = mysql_num_rows($tailored_query);
-			while($row = mysql_fetch_array($tailored_query)) {	
+			$tailored_query = mysqli_query($database_grado_connect, "SELECT `subscription_id`, `subscription_channel`, `channel_key`, `channel_title`, `channel_type`, `channel_updated`, `channel_description`, `channel_header`, `channel_hidden`, `channel_verified`, COUNT(*) AS subscription_count FROM subscriptions RIGHT JOIN channel on subscriptions.subscription_channel LIKE channel.channel_key WHERE `channel_hidden` = 0 $passed_types_injection $exists_injection $tailored_injection GROUP BY subscription_channel ORDER BY subscription_count DESC, channel_updated DESC LIMIT 0, 100");
+			$tailored_count = mysqli_num_rows($tailored_query);
+			while($row = mysqli_fetch_array($tailored_query)) {	
 				//$exists_injection .= " AND `channel_key` NOT LIKE '" . $row['channel_key'] . "'";			
 				$tailored_output[] = channel_output($row);
 				
@@ -97,9 +97,9 @@ if ($passed_method == 'GET') {
 		}
 		
 		if (in_array("trending", $passed_sections)) {
-			$trending_query = mysql_query("SELECT `subscription_id`, `subscription_channel`, `channel_key`, `channel_title`, `channel_type`, `channel_updated`, `channel_description`, `channel_header`, `channel_hidden`, `channel_verified`, COUNT(*) AS subscription_count FROM subscriptions LEFT JOIN channel on subscriptions.subscription_channel LIKE channel.channel_key WHERE `channel_hidden` = 0 $passed_types_injection $exists_injection GROUP BY subscription_channel ORDER BY subscription_count DESC, channel_updated DESC LIMIT 0, 100");
-			$trending_count = mysql_num_rows($trending_query);
-			while($row = mysql_fetch_array($trending_query)) {	
+			$trending_query = mysqli_query($database_grado_connect, "SELECT `subscription_id`, `subscription_channel`, `channel_key`, `channel_title`, `channel_type`, `channel_updated`, `channel_description`, `channel_header`, `channel_hidden`, `channel_verified`, COUNT(*) AS subscription_count FROM subscriptions LEFT JOIN channel on subscriptions.subscription_channel LIKE channel.channel_key WHERE `channel_hidden` = 0 $passed_types_injection $exists_injection GROUP BY subscription_channel ORDER BY subscription_count DESC, channel_updated DESC LIMIT 0, 100");
+			$trending_count = mysqli_num_rows($trending_query);
+			while($row = mysqli_fetch_array($trending_query)) {	
 				//$exists_injection .= " AND `channel_key` NOT LIKE '" . $row['channel_key'] . "'";			
 				$trending_output[] = channel_output($row);
 				
@@ -110,9 +110,9 @@ if ($passed_method == 'GET') {
 		}	
 		
 		if (in_array("nearby", $passed_sections) && strlen($passed_location[0]) > 0 && strlen($passed_location[1]) > 0) {
-			$nearby_query = mysql_query("SELECT `channel_key`, `channel_title`, `channel_type`, `channel_latitude`, `channel_longitude`, `channel_updated`, `channel_description`, `channel_header`, `channel_hidden`, `channel_verified`, (3959 * acos(cos(radians($passed_latitude)) * cos(radians(channel.channel_latitude)) * cos(radians(channel.channel_longitude) - radians($passed_longitude)) + sin(radians($passed_latitude)) * sin(radians(channel.channel_latitude)))) AS channel_distance FROM channel WHERE `channel_type` LIKE 'local' AND `channel_hidden` = 0 $exists_injection HAVING channel_distance < 25 ORDER BY channel_distance DESC, channel_updated DESC LIMIT 0, 10");
-			$nearby_count = mysql_num_rows($nearby_query);
-			while($row = mysql_fetch_array($nearby_query)) {	
+			$nearby_query = mysqli_query($database_grado_connect, "SELECT `channel_key`, `channel_title`, `channel_type`, `channel_latitude`, `channel_longitude`, `channel_updated`, `channel_description`, `channel_header`, `channel_hidden`, `channel_verified`, (3959 * acos(cos(radians($passed_latitude)) * cos(radians(channel.channel_latitude)) * cos(radians(channel.channel_longitude) - radians($passed_longitude)) + sin(radians($passed_latitude)) * sin(radians(channel.channel_latitude)))) AS channel_distance FROM channel WHERE `channel_type` LIKE 'local' AND `channel_hidden` = 0 $exists_injection HAVING channel_distance < 25 ORDER BY channel_distance DESC, channel_updated DESC LIMIT 0, 10");
+			$nearby_count = mysqli_num_rows($nearby_query);
+			while($row = mysqli_fetch_array($nearby_query)) {	
 				//$exists_injection .= " AND `channel_key` NOT LIKE '" . $row['channel_key'] . "'";				
 				$nearby_output[] = channel_output($row);
 				
@@ -130,10 +130,10 @@ if ($passed_method == 'GET') {
 		 
 	}
 	else {
-		$channel_query = mysql_query("SELECT * FROM `channel` LEFT JOIN users on channel.channel_owner LIKE users.user_key WHERE (`channel_key` LIKE '$passed_query' OR  `channel_title` LIKE  '$passed_query') AND `channel_hidden` = 0 AND `user_status` LIKE 'active' LIMIT $passed_pagenation, $passed_limit");
-		$channel_exists = mysql_num_rows($channel_query);
+		$channel_query = mysqli_query($database_grado_connect, "SELECT * FROM `channel` LEFT JOIN users on channel.channel_owner LIKE users.user_key WHERE (`channel_key` LIKE '$passed_query' OR  `channel_title` LIKE  '$passed_query') AND `channel_hidden` = 0 AND `user_status` LIKE 'active' LIMIT $passed_pagenation, $passed_limit");
+		$channel_exists = mysqli_num_rows($channel_query);
 		if ($channel_exists != 0) {
-			$channel_data = mysql_fetch_assoc($channel_query);
+			$channel_data = mysqli_fetch_array($channel_query);
 			$channel_output = channel_output_extended($channel_data);
 			$channel_key = (string)$channel_data['channel_key'];
 			
