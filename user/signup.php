@@ -28,12 +28,11 @@ if ($passed_method == 'POST') {
 		
 	}
 	
-	if (in_array("admin", $application_scope)) {
-		if (empty($passed_type)) $passed_type = "user";
-		else $passed_type = $passed_data['type'];
-	
+	if ($passed_type == "admin") {
+		if ($authuser_type == "admin" && !empty($authentication_user) && in_array("admin", $application_scope)) $$passed_type = "admin";
+		else $passed_type = "user";
+		
 	}
-	else $passed_type = "user";
 		
 	if (empty($passed_email)) {
 		$json_status = 'email parameter missing';

@@ -13,15 +13,15 @@ $passed_device = $_GET['device'];
 if ($passed_method == 'GET') {
 	if (empty($passed_email)) {
 		$json_status = 'email parameter missing';
-		$json_output[] = array('status' => $json_status, 'error_code' => '301');
+		$json_output[] = array('status' => $json_status, 'error_code' => 422);
 		echo json_encode($json_output);
 		exit;
 		
 	}
 	else {
-		$user_query = mysqli_query("SELECT * FROM  `users` WHERE  `user_status` LIKE  'active' AND  `user_email` LIKE  '$passed_email' LIMIT 0, 1");
-		$user_exists = mysql_num_rows($user_query);
-		$user_data = mysql_fetch_assoc($user_query);
+		$user_query = mysqli_query($database_grado_connect, "SELECT * FROM  `users` WHERE  `user_status` LIKE  'active' AND  `user_email` LIKE  '$passed_email' LIMIT 0, 1");
+		$user_exists = mysqli_num_rows($user_query);
+		$user_data = mysqli_fetch_assoc($user_query);
 		$user_key = $user_data['user_key'];
 		if (empty($user_data['user_actualname'])) $user_name = $user_data['user_name'];
 		else $user_name = $user_data['user_actualname'];
@@ -30,7 +30,7 @@ if ($passed_method == 'GET') {
 			$user_password = generate_password();
 			$user_passwordencripted = password_hash($user_password ,PASSWORD_BCRYPT);
 			
-			$user_update = mysqli_query("UPDATE `users` SET `user_password` = '$user_passwordencripted' WHERE `user_email` LIKE '$passed_email';");
+			$user_update = mysqli_query($database_grado_connect, "UPDATE `users` SET `user_password` = '$user_passwordencripted' WHERE `user_email` LIKE '$passed_email';");
 			if ($user_update) {
 				$email_subject = "Password Reset";
 				$email_body .= "Your password has been reset, here is your new password (you can click it to auto login if your on iOS)";
@@ -39,17 +39,17 @@ if ($passed_method == 'GET') {
 				$email_body .= "</a></div></center>";
 				$email_body .= "<p>You can change this to something more memorable by navigating to <strong>Settings</strong> > <strong>User Password</strong> in the app.";
 				
-				$email_push = email_user($email_subject, $email_body, $user_key, "", "true");
+				$email_push = email_user($email_subject, $email_body, $passed_email, "", "true");
 					
-				$json_status = 'Your new password has been sent to you.';
-				$json_output[] = array('status' => $json_status, 'error_code' => '200', 'email' => $email_push);
+				$json_status = $email_push['status'];
+				$json_output[] = array('status' => $json_status, 'error_code' => (int)$email_push['error_code']);
 				echo json_encode($json_output);
 				exit;
 				
 			}
 			else {
 				$json_status = 'Password could not be reset - ' . mysql_error();
-				$json_output[] = array('status' => $json_status, 'error_code' => '310');
+				$json_output[] = array('status' => $json_status, 'error_code' => 400);
 				echo json_encode($json_output);
 				exit;
 				
@@ -58,7 +58,7 @@ if ($passed_method == 'GET') {
 		}
 		else {
 			$json_status = 'User does not exist with the email ' . $passed_email;
-			$json_output[] = array('status' => $json_status, 'error_code' => '350');
+			$json_output[] = array('status' => $json_status, 'error_code' => 350);
 			echo json_encode($json_output);
 			exit;
 			
