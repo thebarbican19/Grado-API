@@ -28,7 +28,7 @@ function add_viewcount($item, $user) {
 		}
 		else {
 			$analytics_post_output = "added";		
-			$analytics_post = mysqli_query("INSERT INTO `views` (`view_id`, `view_timestamp`, `view_user`, `view_content`, `view_count`) VALUES (NULL, CURRENT_TIMESTAMP, '$user', '$item', '1');");
+			$analytics_post = mysqli_query($database_grado_connect, "INSERT INTO `views` (`view_id`, `view_timestamp`, `view_user`, `view_content`, `view_count`) VALUES (NULL, CURRENT_TIMESTAMP, '$user', '$item', '1');");
 						
 		}
 		
@@ -93,13 +93,13 @@ function return_user_stats($user) {
 		$analytics_comment_query = mysqli_query($database_grado_connect, "SELECT COUNT(*) AS count FROM `comments` WHERE `comment_user` LIKE  '$user' AND `comment_deleted` = 0");
 		$analytics_comment_count = mysqli_fetch_assoc($analytics_comment_query)['count'];
 		
-		$analytics_likes_query = mysqli_query($database_grado_connect, "SELECT COUNT(*) FROM `likes` WHERE `like_user` LIKE  '$user'");
+		$analytics_likes_query = mysqli_query($database_grado_connect, "SELECT COUNT(*) AS count FROM `likes` WHERE `like_user` LIKE  '$user'");
 		$analytics_likes_count = mysqli_fetch_assoc($analytics_likes_query)['count'];
 				
-		$analytics_posts_query = mysqli_query($database_grado_connect, "SELECT COUNT(*) FROM `content` WHERE `content_owner` LIKE '$user' AND `content_hidden` = 0");
+		$analytics_posts_query = mysqli_query($database_grado_connect, "SELECT COUNT(*) AS count FROM `content` WHERE `content_owner` LIKE '$user' AND `content_hidden` = 0");
 		$analytics_posts_count = mysqli_fetch_assoc($analytics_posts_query)['count'];
 					
-		$analytics_karma_query = mysqli_query($database_grado_connect, "SELECT SUM(`karma_score`) FROM  `karma` WHERE  `karma_user` LIKE  '$user'");
+		$analytics_karma_query = mysqli_query($database_grado_connect, "SELECT SUM(`karma_score`) AS count FROM  `karma` WHERE  `karma_user` LIKE  '$user'");
 		$analytics_karma_count = mysqli_fetch_assoc($analytics_karma_query)['count'];
 		
 		return array("comments" => (int)$analytics_comment_count, "likes" => (int)$analytics_likes_count, "uploads" => (int)$analytics_posts_count, "score" => (int)$analytics_karma_count);

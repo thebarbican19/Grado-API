@@ -25,17 +25,16 @@ if (!$database_grado_table) {
 	
 }
 
-
-
 $session_info = file_get_contents('http://ip-api.com/json');
 $session_info = json_decode($session_info);
 $session_country = strtolower($session_info->countryCode);
 $session_isp = $session_info->isp;
 $session_headers = $_SERVER;
+$session_hosturl = $_SERVER['HTTP_HOST'];
 $session_ip = $_SERVER['REMOTE_ADDR'];
 $session_url =  $_SERVER["SERVER_NAME"] . reset(explode('?', $_SERVER["REQUEST_URI"]));
 $session_page = str_replace(".php", "", basename($session_url));
-$session_exclude = array("signup", "authenticate", "namechecker", "mailing", "avatar", "reset", "command_user", "command_message", "command_stats", "command_addmailing", "stream", "flag", "search", "vidparser", "mailing", "keywords", "feedback", "channel", "sitemap", "clouty", "cineparse");
+$session_exclude = array("signup", "authenticate", "namechecker", "mailing", "avatar", "reset", "command_user", "command_message", "command_stats", "command_addmailing", "stream", "flag", "search", "vidparser", "mailing", "keywords", "feedback", "channel", "sitemap");
 $session_bearer = $session_headers["HTTP_GDBEARER"];
 $session_application = $session_headers["HTTP_GDAPPKEY"];
 if (empty($session_headers["HTTP_GDAPPKEY"])) $session_application = $_GET['appkey'];
@@ -60,12 +59,13 @@ if (isset($session_application) || $session_slackteam == 'T06KCC0D6') {
 	$application_output = mysqli_fetch_assoc($application_query);
 	$application_name = $application_output['app_name'];
 	$application_description = $application_output['app_description'];
+	$application_domain = $application_output['app_domain'];
 	$application_scope = explode(",", $application_output['app_scope']);
-	if ($application_exists == 0 && $session_slackteam != 'T06KCC0D6') {
+	if ($application_exists == 0 && (empty($application_domain) || $application_domain == $session_hosturl)) {
 		header('HTTP/1.1 400 APPLICATION KEY INVALID', true, 400);
 			
 		$json_status = 'application key is invalid';
-		$json_output[] = array('status' => $json_status, 'error_code' => 400);
+		$json_output[] = array('status' => $json_status, 'error_code' => 400, 'appdom' => $application_domain, 'host' => $session_hosturl);
 		echo json_encode($json_output);
 		exit;
 			
