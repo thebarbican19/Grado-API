@@ -18,12 +18,12 @@ function add_viewcount($item, $user) {
 		$analytics_exists_query = mysqli_query($database_grado_connect, "SELECT * FROM `views` WHERE `view_user` LIKE '$user' AND `view_content` LIKE '$item' LIMIT 0, 1");
 		$analytics_exists_count = mysqli_num_rows($analytics_exists_query);
 		if ($analytics_exists_count == 1) {
-			$analytics_exists_data = mysql_fetch_assoc($analytics_exists_query);
+			$analytics_exists_data = mysqli_fetch_assoc($analytics_exists_query);
 			$analytics_exists_views = (int)$analytics_exists_data['view_count'] + 1;
 			$analytics_exists_id = $analytics_exists_data['view_id'];
 			
 			$analytics_post_output = "updated";
-			$analytics_post = mysqli_query("UPDATE `views` SET `view_timestamp` = CURRENT_TIMESTAMP, `view_count` = '$analytics_exists_views' WHERE `view_id` = $analytics_exists_id;");
+			$analytics_post = mysqli_query($database_grado_connect, "UPDATE `views` SET `view_timestamp` = CURRENT_TIMESTAMP, `view_count` = '$analytics_exists_views' WHERE `view_id` = $analytics_exists_id;");
 					
 		}
 		else {
@@ -63,14 +63,14 @@ function return_stats($item) {
 		$itm_current = strtotime(date("Y-m-d H:i:s"));
 		$itm_hour = round(($itm_current - $itm_timestamp) / 3600, 0);
 		
-		$analytics_like_query = mysqli_query("SELECT * FROM `likes` WHERE `like_content` LIKE '$item'");
+		$analytics_like_query = mysqli_query($database_grado_connect, "SELECT * FROM `likes` WHERE `like_content` LIKE '$item'");
 		$analytics_like_count = mysqli_num_rows($analytics_like_query);
 		$analytics_like_count = $itm_hour + $analytics_like_count;
 		
-		$analytics_comments_query = mysqli_query("SELECT * FROM `comments` WHERE  `comment_item` LIKE '$item'");
+		$analytics_comments_query = mysqli_query($database_grado_connect, "SELECT * FROM `comments` WHERE  `comment_item` LIKE '$item'");
 		$analytics_comments_count = mysqli_num_rows($analytics_comments_query);	
 	
-		$analytics_view_query = mysqli_query("SELECT * FROM `views` WHERE `view_content` LIKE '$item'");
+		$analytics_view_query = mysqli_query($database_grado_connect, "SELECT * FROM `views` WHERE `view_content` LIKE '$item'");
 		$analytics_view_count = mysqli_num_rows($analytics_view_query);	
 		$analytics_view_total = 0;
 		while($row = mysqli_fetch_array($analytics_view_query)) {	

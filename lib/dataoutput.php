@@ -15,6 +15,8 @@ function channel_output($data) {
 }
 
 function channel_output_extended($data) {
+	global $authuser_key;	
+		
 	$channel_title = (string)$data['channel_title'];
 	$channel_key = (string)$data['channel_key'];
 	$channel_type = (string)$data['channel_type'];			
@@ -22,7 +24,7 @@ function channel_output_extended($data) {
 	$channel_updated = $data['channel_updated'];
 	$channel_summary = (string)$data['channel_description'];
 	$channel_header = (string)$data['channel_header'];
-	$channel_url = "http://gradoapp.com/" . $channel_title;
+	$channel_url = "https://gradoapp.com/" . $channel_title;
 	$channel_tags = explode(",", $data['channel_tags']);
 	$channel_admins = explode(",", $data['channel_admins']);
 	$channel_latitude = (float)$data['channel_latitude'];
@@ -39,9 +41,9 @@ function channel_output_extended($data) {
 		
 	}
 				
-	$channel_ownername = (string)$channel_data['user_name'];
-	$channel_ownerkey = (string)$channel_data['user_key'];
-	$channel_owneravatar = (string)$channel_data['user_avatar'];
+	$channel_ownername = (string)$data['user_name'];
+	$channel_ownerkey = (string)$data['user_key'];
+	$channel_owneravatar = (string)$data['user_avatar'];
 	$channel_owner = array('username' => $channel_ownername, 'id' => $channel_ownerkey, 'ovatar' => $channel_owneravatar);
 								
 	return array('id' => $channel_key, 'type' => $channel_type, 'title' => $channel_title, 'description' => $channel_summary, 'added' => $channel_uploaded, 'lastupdated' => $channel_updated, 'header' => $channel_header, 'publicurl' => $channel_url, 'owner' => $channel_owner, 'moderators' => $channel_admins, 'tags' => $channel_tagsf, 'location' => $channel_coordinates, 'stats' => $channel_stats, 'verifyed' => $channel_verifyed, 'removed' => $channel_hidden, 'subscribed' => $channel_subscribed);

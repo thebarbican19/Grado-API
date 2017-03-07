@@ -136,10 +136,11 @@ if ($passed_method == 'GET') {
 			$channel_data = mysqli_fetch_array($channel_query);
 			$channel_output = channel_output_extended($channel_data);
 			$channel_key = (string)$channel_data['channel_key'];
-			
+			$channel_title = (string)$channel_data['channel_title'];
+						
 			add_viewcount($channel_key, $authuser_key);
 			
-			$json_status = 'returned data for ' . $channel_title;
+			$json_status = 'returned data for ' . $channel_output;
 			$json_output[] = array('status' => $json_status, 'error_code' => 200, 'output' => $channel_output);
 			echo json_encode($json_output);
 			exit;

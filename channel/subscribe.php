@@ -102,17 +102,18 @@ elseif ($passed_method == 'PUT') {
 	
 }
 elseif ($passed_method == 'DELETE') {
+	$passed_key = $_GET['channel'];
 	if (empty($passed_key)) {
-		$json_status = 'key parameter is missing';
+		$json_status = 'channel parameter is missing';
 		$json_output[] = array('status' => $json_status, 'error_code' => 422);
 		echo json_encode($json_output);
 		exit;
 		
 	}
 	else {
-		$subscribtion_query = mysqli_query($database_grado_connect, "SELECT subscription_id, subscription_key, channel_title, channel_type FROM subscriptions LEFT JOIN channel ON subscriptions.subscription_channel LIKE channel.channel_key WHERE subscription_key LIKE '$passed_key' LIMIT 0 , 1");
-		$subscribtion_exists = mysql_num_rows($subscribtion_query);
-		$subscription_data = mysql_fetch_assoc($subscribtion_query);
+		$subscribtion_query = mysqli_query($database_grado_connect, "SELECT subscription_id, subscription_key FROM subscriptions WHERE subscription_channel LIKE '$passed_key' AND subscription_user LIKE '$authuser_key' LIMIT 0 , 1");
+		$subscribtion_exists = mysqli_num_rows($subscribtion_query);
+		$subscription_data = mysqli_fetch_assoc($subscribtion_query);
 		$subscription_channel = $subscription_data['channel_title'];
 		if ($subscribtion_exists == 0) {
 			$json_status = 'subscription does not exist';
@@ -122,7 +123,7 @@ elseif ($passed_method == 'DELETE') {
 			
 		}
 		else {
-			$subscription_delete = mysqli_query($database_grado_connect, "DELETE FROM subscriptions WHERE subscription_key LIKE '$passed_key';");
+			$subscription_delete = mysqli_query($database_grado_connect, "DELETE FROM subscriptions WHERE subscription_channel LIKE '$passed_key' AND subscription_user LIKE '$authuser_key';");
 			if ($subscription_delete) {
 				$push_unsubscribe = unsubscribe_to_channel($authuser_username, $authuser_device, $subscription_channel);
 				
