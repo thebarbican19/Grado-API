@@ -1,9 +1,10 @@
 <?
 
 function email_mailgun_connect($url, $data, $method) {
+	$ch_url = "https://api.mailgun.net/v3/" . $url;
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_URL, $ch_url);
 	curl_setopt($ch, CURLOPT_USERPWD, "api:key-8f933c67697b82ef9455014e2b5c5ca0");
 	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
@@ -70,7 +71,7 @@ function email_user($email_subject, $email_body, $email_user, $email_sender, $em
 		$email_data['subject'] = $email_subject;
 		$email_data['html'] = $email_formatted;
 		
-		$email_output = email_mailgun_connect("https://api.mailgun.net/v3/mg.gradoapp.com/messages", $email_data, "POST");
+		$email_output = email_mailgun_connect("mg.gradoapp.com/messages", $email_data, "POST");
 		
 		if ($email_output->message == "Queued. Thank you.") $json_output = array("status" => $email_output->message, 'error_code' => 200);
 		else $json_output = array("status" => $email_output->message, 'error_code' => 400, 'data' => $email_data);
@@ -88,13 +89,13 @@ function email_new_mailinglist($channel_key, $channel_name) {
 	$email_data['name'] = $channel_name;
 	$email_data['description'] = "Auto Mailing list for " . $channel_name . " (" . $channel_key . ")";
 	
- 	return email_mailgun_connect("https://api.mailgun.net/v3/lists", $email_data, "POST");
+ 	return email_mailgun_connect("lists", $email_data, "POST");
 	
 }
 
 
 function email_delete_mailinglist($channel_name) {
- 	return email_mailgun_connect("https://api.mailgun.net/v3/lists/" . $channel_name . "@mg.gradoapp.com", array(), "DELETE");
+ 	return email_mailgun_connect("lists/" . $channel_name . "@mg.gradoapp.com", array(), "DELETE");
 	
 }
 
@@ -102,14 +103,17 @@ function email_subscribe_mailinglist($channel_name, $subscriber_email, $subscrib
 	$email_data = array();
 	$email_data['address'] = $subscriber_email;
 	$email_data['name'] = $subscriber_username;
-	$email_data['subscribed'] = true;
+	$email_data['subscribed'] = "yes";
 	
-  	return email_mailgun_connect("https://api.mailgun.net/v3/lists/" . $channel_name . "@mg.gradoapp.com/members", $email_data, "POST");
+  	return email_mailgun_connect("lists/" . $channel_name . "@mg.gradoapp.com/members", $email_data, "POST");
 	
 }
 
-function email_unsubscribe_mailinglist($channel_name) {
- 	return email_mailgun_connect("https://api.mailgun.net/v3/lists/" . $channel_name . "@mg.gradoapp.com", array(), "DELETE");
+function email_unsubscribe_mailinglist($channel_name, $subscriber_email) {
+	$email_data = array();
+	$email_data['subscribed'] = "no";
+	
+  	return email_mailgun_connect("lists/" . $channel_name . "@mg.gradoapp.com/members/" . $subscriber_email, $email_data, "PUT");
 	
 }
 

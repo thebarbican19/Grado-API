@@ -3,10 +3,10 @@
 $_SERVER["HTTP_GDAPPKEY"] = "app_HAnda8123nsBZvs81sbZ7aoPi9s88s";
 $_SERVER["HTTP_GDBEARER"] = "at_GRADMIN93712hd621hbn231dAWH2hs";
 
-include '/home/gradoapp/public_html/api/v1/lib/auth.php';
-include '/home/gradoapp/public_html/api/v1/lib/parser.php';
-include '/home/gradoapp/public_html/api/v1/lib/keygen.php';
-include '/home/gradoapp/public_html/api/v1/lib/push.php';
+include '/var/www/html/gradoapp/api/v1/lib/auth.php';
+include '/var/www/html/gradoapp/api/v1/lib/parser.php';
+include '/var/www/html/gradoapp/api/v1/lib/keygen.php';
+include '/var/www/html/gradoapp/api/v1/lib/push.php';
 
 $source_query = mysqli_query("SELECT source_key, source_updated, source_updated, source_url, source_endpoint, source_type, source_latitude, source_longitude, channel_key, channel_owner, channel_title FROM sources LEFT JOIN channel ON FIND_IN_SET( sources.source_key, channel.channel_sources) > 0 ORDER BY source_updated ASC LIMIT 0 , 1");
 $source_data = mysql_fetch_assoc($source_query);

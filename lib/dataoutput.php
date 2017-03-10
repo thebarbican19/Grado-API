@@ -34,6 +34,7 @@ function channel_output_extended($data) {
 	$channel_verifyed = (int)$data['channel_verified'];			
 	$channel_stats = return_stats($channel_key);
 	$channel_subscribed = channel_subscribed($authuser_key,$channel_key);
+	$channel_canedit = channel_canedit($data);
 		
 	$channel_tagsf = array();
 	foreach ($channel_tags as $tag) {
@@ -46,7 +47,7 @@ function channel_output_extended($data) {
 	$channel_owneravatar = (string)$data['user_avatar'];
 	$channel_owner = array('username' => $channel_ownername, 'id' => $channel_ownerkey, 'ovatar' => $channel_owneravatar);
 								
-	return array('id' => $channel_key, 'type' => $channel_type, 'title' => $channel_title, 'description' => $channel_summary, 'added' => $channel_uploaded, 'lastupdated' => $channel_updated, 'header' => $channel_header, 'publicurl' => $channel_url, 'owner' => $channel_owner, 'moderators' => $channel_admins, 'tags' => $channel_tagsf, 'location' => $channel_coordinates, 'stats' => $channel_stats, 'verifyed' => $channel_verifyed, 'removed' => $channel_hidden, 'subscribed' => $channel_subscribed);
+	return array('id' => $channel_key, 'type' => $channel_type, 'title' => $channel_title, 'description' => $channel_summary, 'added' => $channel_uploaded, 'lastupdated' => $channel_updated, 'header' => $channel_header, 'publicurl' => $channel_url, 'owner' => $channel_owner, 'moderators' => $channel_admins, 'tags' => $channel_tagsf, 'location' => $channel_coordinates, 'stats' => $channel_stats, 'verifyed' => $channel_verifyed, 'removed' => $channel_hidden, 'subscribed' => $channel_subscribed, 'editable' => $channel_canedit);
 	
 }
 
@@ -58,6 +59,20 @@ function channel_subscribed($user,$subscription) {
 	$subscription_bool = mysqli_num_rows($subscription_query);
 	
 	return $subscription_bool;
+	
+}
+
+function channel_canedit($data) {
+	global $authuser_key;	
+	global $authuser_type;	
+	
+	$channen_owner = $data['channel_owner'];
+	$channen_moderators = explode(",", $data['channel_admins']);
+		
+	if ($authuser_key == $channen_owner) return 1;
+	else if ($authuser_type == "admin") return 1;
+	else if (in_array($authuser_key, $channen_moderators)) return 1;
+	else return 0;
 	
 }
 

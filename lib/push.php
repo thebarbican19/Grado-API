@@ -55,6 +55,7 @@ function pushbots($api, $data, $method) {
     curl_setopt($curl_pushbots, CURLOPT_RETURNTRANSFER, TRUE); 
 	curl_setopt($curl_pushbots, CURLOPT_HTTPHEADER, $curl_headers);
 	curl_setopt($curl_pushbots, CURLOPT_HEADER, FALSE); 
+	curl_setopt($curl_pushbots, CURLOPT_SSL_VERIFYPEER, FALSE);
 	if ($method == "POST") {
 		 curl_setopt($curl_pushbots, CURLOPT_POST, TRUE); 
 		 curl_setopt($curl_pushbots, CURLOPT_POSTFIELDS, $curl_data); 

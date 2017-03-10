@@ -32,9 +32,7 @@ if ($passed_method == 'POST') {
 				$subscribtion_key =  "sub_" . generate_key();		
 				$subscribe_add = mysqli_query($database_grado_connect, "INSERT INTO  subscriptions (subscription_id ,subscription_timestamp ,subscription_key ,subscription_user ,subscription_channel ,subscription_email ,subscription_push) VALUES (NULL , CURRENT_TIMESTAMP ,  '$subscribtion_key',  '$authuser_key',  '$passed_channel',  '$passed_emails',  '$passed_push');");
 				if ($subscribe_add) {
-					//if ($passed_emails == 1)
-					//email_subscribe_mailinglist($subscribtion_channelname, $authuser_email, $authuser_username);
-					
+					if ($passed_emails == 1) $email_post = email_subscribe_mailinglist($channel_name, $authuser_email, $authuser_username);
 					if ($passed_push == 1) subscribe_to_channel($authuser_username, $authuser_device, $channel_name);
 					
 					$json_status = 'subscription was added';
@@ -111,7 +109,7 @@ elseif ($passed_method == 'DELETE') {
 		
 	}
 	else {
-		$subscribtion_query = mysqli_query($database_grado_connect, "SELECT subscription_id, subscription_key FROM subscriptions WHERE subscription_channel LIKE '$passed_key' AND subscription_user LIKE '$authuser_key' LIMIT 0 , 1");
+		$subscribtion_query = mysqli_query($database_grado_connect, "SELECT subscription_id, subscription_key, channel_title, channel_type FROM subscriptions LEFT JOIN channel ON subscriptions.subscription_channel LIKE channel.channel_key WHERE subscription_channel LIKE '$passed_key' AND subscription_user LIKE '$authuser_key' LIMIT 0 , 1");
 		$subscribtion_exists = mysqli_num_rows($subscribtion_query);
 		$subscription_data = mysqli_fetch_assoc($subscribtion_query);
 		$subscription_channel = $subscription_data['channel_title'];
@@ -126,9 +124,10 @@ elseif ($passed_method == 'DELETE') {
 			$subscription_delete = mysqli_query($database_grado_connect, "DELETE FROM subscriptions WHERE subscription_channel LIKE '$passed_key' AND subscription_user LIKE '$authuser_key';");
 			if ($subscription_delete) {
 				$push_unsubscribe = unsubscribe_to_channel($authuser_username, $authuser_device, $subscription_channel);
-				
+				email_unsubscribe_mailinglist($subscription_channel, $authuser_email);
+								
 				$json_status = 'sucsessfully unsubscribed';
-				$json_output[] = array('status' => $json_status, 'error_code' => 200, 'push' => $push_unsubscribe);
+				$json_output[] = array('status' => $json_status, 'error_code' => 200);
 				echo json_encode($json_output);
 				exit;
 				

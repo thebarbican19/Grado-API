@@ -93,7 +93,7 @@ if ($passed_method == 'POST') {
 				}
 				else {			
 					$user_key = "user_" . generate_key();
-					$user_create = mysqli_query($database_grado_connect, "INSERT INTO `users` (`user_id`, `user_key`, `user_signup`, `user_lastactive`, `user_status`, `user_type`, `user_email`, `user_password`, `user_name`, `user_actualname`, `user_slack`, `user_avatar`, `user_device`, `user_city`, `user_country`, `user_language`) VALUES (NULL, '$user_key', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'active', '$passed_type', '$passed_email', '$passed_encryptpassword', '$passed_username', '', '$passed_slack', '$user_ovatar', '$passed_device', '', '$session_country', '$session_language');");
+					$user_create = mysqli_query($database_grado_connect, "INSERT INTO `users` (`user_id`, `user_key`, `user_signup`, `user_lastactive`, `user_status`, `user_type`, `user_email`, `user_password`, `user_name`, `user_actualname`, `user_slack`, `user_customer`, `user_avatar`, `user_device`, `user_city`, `user_country`, `user_language`) VALUES (NULL, '$user_key', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'active', '$passed_type', '$passed_email', '$passed_encryptpassword', '$passed_username', '', '$passed_slack', '', '$user_ovatar', '$passed_device', '', '$session_country', '$session_language');");
 					
 				}
 				

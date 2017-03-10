@@ -16,10 +16,10 @@ $passed_avatar = $_FILES['avatar'];
 
 if ($passed_method == 'GET') {
 	$user_stats = return_user_stats($authuser_key);
-	$user_output = array("key" => $authuser_key, "username" => $authuser_username, "email" => $authuser_email, "type" => $authuser_type, "slack" => $authuser_slack, "avatar" => $authuser_avatar, "location" => $authuser_location, "langauge" => $authuser_language, "lastactive" => $authuser_lastactive, "signup" => $authuser_signup, "stats" => $user_stats);	
+	$user_output = array("key" => $authuser_key, "username" => $authuser_username, "email" => $authuser_email, "type" => $authuser_type, "slack" => $authuser_slack, "avatar" => $authuser_avatar, "location" => $authuser_location, "langauge" => $authuser_language, "lastactive" => $authuser_lastactive, "signup" => $authuser_signup, "stats" => $user_stats, 'applications' => $application_data);	
 	
 	$json_status = 'user data returned';
-	$json_output[] = array('status' => $json_status, 'error_code' => '200', 'user' => $user_output);
+	$json_output[] = array('status' => $json_status, 'error_code' => 200, 'user' => $user_output);
 	echo json_encode($json_output);
 	exit;
 						
@@ -30,7 +30,7 @@ elseif ($passed_method == 'PUT') {
 	$allowed_imagetypes = array("png", "jpg", "jpeg");
 	if (!in_array("update", $application_scope)) {
 		$json_status = 'application does not have the privileges to access this api';
-		$json_output[] = array('status' => $json_status, 'error_code' => '371');
+		$json_output[] = array('status' => $json_status, 'error_code' => 401);
 		echo json_encode($json_output);
 		exit;
 		
@@ -38,21 +38,21 @@ elseif ($passed_method == 'PUT') {
 	
 	if (empty($passed_type)) {
 		$json_status = 'type parameter missing';
-		$json_output[] = array('status' => $json_status, 'error_code' => '301');
+		$json_output[] = array('status' => $json_status, 'error_code' => 422);
 		echo json_encode($json_output);
 		exit;
 		
 	}
 	else if (!in_array($passed_type, $allowed_types)) {
 		$json_status = 'type parameter is invalid';
-		$json_output[] = array('status' => $json_status, 'error_code' => '301');
+		$json_output[] = array('status' => $json_status, 'error_code' => 422);
 		echo json_encode($json_output);
 		exit;
 		
 	}
 	else if (empty($passed_value)) {
 		$json_status = 'value parameter missing';
-		$json_output[] = array('status' => $json_status, 'error_code' => '301');
+		$json_output[] = array('status' => $json_status, 'error_code' => 422);
 		echo json_encode($json_output);
 		exit;
 		
@@ -61,7 +61,7 @@ elseif ($passed_method == 'PUT') {
 		if ($passed_type == "status") {
 			if (!in_array($passed_value, $allowed_statuses)) {
 				$json_status = 'status is invalid';
-				$json_output[] = array('status' => $json_status, 'error_code' => '310');
+				$json_output[] = array('status' => $json_status, 'error_code' => 422);
 				echo json_encode($json_output);
 				exit;
 				
@@ -72,7 +72,7 @@ elseif ($passed_method == 'PUT') {
 		elseif ($passed_type == "email") {
 			if (filter_var($passed_value, FILTER_VALIDATE_EMAIL) === false) {
 				$json_status = 'email is invalid';
-				$json_output[] = array('status' => $json_status, 'error_code' => '310');
+				$json_output[] = array('status' => $json_status, 'error_code' => 422);
 				echo json_encode($json_output);
 				exit;
 				
@@ -83,7 +83,7 @@ elseif ($passed_method == 'PUT') {
 		elseif ($passed_type == "password") {
 			if (strlen($passed_value) < 5) {
 				$json_status = 'password is too short';
-				$json_output[] = array('status' => $json_status, 'error_code' => '310');
+				$json_output[] = array('status' => $json_status, 'error_code' => 422);
 				echo json_encode($json_output);
 				exit;
 				
@@ -98,7 +98,7 @@ elseif ($passed_method == 'PUT') {
 		elseif ($passed_type == "slack") {
 			if (strlen($passed_value) != 8 && strlen($passed_value) > 12) {
 				$json_status = 'slack username is invalid';
-				$json_output[] = array('status' => $json_status, 'error_code' => '310');
+				$json_output[] = array('status' => $json_status, 'error_code' => 422);
 				echo json_encode($json_output);
 				exit;
 				
@@ -112,7 +112,7 @@ elseif ($passed_method == 'PUT') {
 		elseif ($passed_type == "device") {
 			if (strlen($passed_value) != 64) {
 				$json_status = 'device token is invalid';
-				$json_output[] = array('status' => $json_status, 'error_code' => '310');
+				$json_output[] = array('status' => $json_status, 'error_code' => 422);
 				echo json_encode($json_output);
 				exit;
 				
@@ -127,7 +127,7 @@ elseif ($passed_method == 'PUT') {
 		elseif ($passed_type == "language") {
 			if (strlen($passed_value) != 2) {
 				$json_status = 'langauge code invalid';
-				$json_output[] = array('status' => $json_status, 'error_code' => '310');
+				$json_output[] = array('status' => $json_status, 'error_code' => 422);
 				echo json_encode($json_output);
 				exit;
 				
@@ -145,14 +145,14 @@ elseif ($passed_method == 'PUT') {
 		$update_post = mysql_query("UPDATE `users` SET $update_injection WHERE `user_key` LIKE '$authuser_key';");
 		if ($update_post) {
 			$json_status = 'user ' . $passed_type . ' was sucsessfully updated';
-			$json_output[] = array('status' => $json_status, 'error_code' => '200', 'pushbots' => $update_push);
+			$json_output[] = array('status' => $json_status, 'error_code' => 200, 'pushbots' => $update_push);
 			echo json_encode($json_output);
 			exit;
 			
 		}
 		else {
 			$json_status = 'user ' . $passed_type . ' could not be updated - ' . mysql_error();
-			$json_output[] = array('status' => $json_status, 'error_code' => '310');
+			$json_output[] = array('status' => $json_status, 'error_code' => 400);
 			echo json_encode($json_output);
 			exit;
 			
@@ -164,7 +164,7 @@ elseif ($passed_method == 'PUT') {
 elseif ($passed_method == 'POST') {
 	if (empty($passed_avatar)) {
 		$json_status = 'avatar was not passed';
-		$json_output[] = array('status' => $json_status, 'error_code' => '310', 'file' => $passed_avatar);
+		$json_output[] = array('status' => $json_status, 'error_code' => 422, 'file' => $passed_avatar);
 		echo json_encode($json_output);
 		exit;
 		
@@ -187,14 +187,14 @@ elseif ($passed_method == 'POST') {
 				$karma_return = add_karma($karma_points, $karma_title, $karma_description, $authuser_key);			
 				
 				$json_status = 'user ' . $passed_type . ' was sucsessfully updated';
-				$json_output[] = array('status' => $json_status, 'error_code' => '200', 'file' => $upload_directory);
+				$json_output[] = array('status' => $json_status, 'error_code' => 200, 'file' => $upload_directory);
 				echo json_encode($json_output);
 				exit;
 				
 			}
 			else {
 				$json_status = 'user ' . $passed_type . ' could not be updated - ' . mysql_error();
-				$json_output[] = array('status' => $json_status, 'error_code' => '310');
+				$json_output[] = array('status' => $json_status, 'error_code' => 400);
 				echo json_encode($json_output);
 				exit;
 				
@@ -207,7 +207,7 @@ elseif ($passed_method == 'POST') {
 }
 else {
 	$json_status = $passed_method . ' menthods are not supported in the api';
-	$json_output[] = array('status' => $json_status, 'error_code' => '380');
+	$json_output[] = array('status' => $json_status, 'error_code' => 405);
 	echo json_encode($json_output);
 	exit;
 	
