@@ -14,6 +14,7 @@ $passed_include = explode(",", $_GET['include']);
 $passed_location = explode(",", $_GET['latlng']);
 $passed_search = $_GET['query'];
 $passed_key = $_GET['key'];
+$passed_channel = $_GET['channel'];
 
 $passed_latitude = reset($passed_location);
 $passed_longitude = end($passed_location);
@@ -113,7 +114,21 @@ if ($passed_method == 'GET') {
 			
 				$stream_sql = "SELECT *, COUNT(*) FROM likes LEFT JOIN content on likes.like_content LIKE content.content_key LEFT JOIN users on content.content_owner LIKE users.user_key WHERE $include_injection $flagged_injection like_timestamp > '$expiry_timestamp' $search_injection (content_public = 1 OR content_owner LIKE '$authuser_key') AND content_hidden = 0 AND user_status LIKE 'active' GROUP BY like_content ORDER BY COUNT(*) DESC, like_timestamp DESC LIMIT $passed_pagenation, $passed_limit";			
 				
-			}			
+			}	
+			elseif ($passed_type == "channel") {
+				if (!empty($passed_channel)) {
+					stream_sql = "SELECT *, COUNT(*) FROM likes LEFT JOIN content on likes.like_content LIKE content.content_key LEFT JOIN users on content.content_owner LIKE users.user_key WHERE $include_injection $flagged_injection like_timestamp > '$expiry_timestamp' content_channels LIKE '$passed_channel' (content_public = 1 OR content_owner LIKE '$authuser_key') AND content_hidden = 0 AND user_status LIKE 'active' GROUP BY like_content ORDER BY COUNT(*) DESC, like_timestamp DESC LIMIT $passed_pagenation, $passed_limit";	
+					
+				}
+				else {
+					$json_status = 'channel parameter missing';
+					$json_output[] = array('status' => $json_status, 'error_code' => 422);
+					echo json_encode($json_output);
+					exit;
+					
+				}
+				
+			}
 			
 			$stream_query = mysql_query($stream_sql);		
 			$stream_count = mysql_num_rows($stream_query);

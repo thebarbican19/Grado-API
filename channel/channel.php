@@ -94,7 +94,7 @@ if ($passed_method == 'GET') {
 				
 			}
 			
-			if ($tailored_count > 2) $channel_output[] = array("channels" => $tailored_output, "type" => "tailored", "title" => "You may like");
+			if ($tailored_count > 1) $channel_output[] = array("channels" => $tailored_output, "type" => "tailored", "title" => "You may like");
 			
 		}
 		
@@ -107,7 +107,7 @@ if ($passed_method == 'GET') {
 				
 			}
 			
-			if ($trending_count > 2) $channel_output[] = array("channels" => $trending_output, "type" => "trending", "title" => "Trending");
+			if ($trending_count > 1) $channel_output[] = array("channels" => $trending_output, "type" => "trending", "title" => "Trending");
 						
 		}	
 		
@@ -121,7 +121,7 @@ if ($passed_method == 'GET') {
 			}
 			
 			
-			if ($nearby_count > 2) $channel_output[] = array("channels" => $nearby_output, "type" => "nearby", "title" => "Local");
+			if ($nearby_count > 1) $channel_output[] = array("channels" => $nearby_output, "type" => "nearby", "title" => "Local");
 						
 		}		
 				

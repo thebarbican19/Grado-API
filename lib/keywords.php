@@ -1,5 +1,7 @@
 <?
 
+mysqli_select_db($database_grado_connect, "gradtag");
+
 function tags_popularity($text, $limit) {
 	$text_format = preg_replace('/[^a-zA-Z\d -]+/i', '', $text);
 	$text_format = strtolower($text_format);
@@ -42,12 +44,6 @@ function tags_produce($text) {
 	elseif ($text_word_count > 1800) $tag_minimum_count = 5;
 	else $tag_minimum_count = 1;
 		
-	if ($text_word_count > 350) {
-		$tags_added[] = "blog";					
-		$tags_output[] = array("tag" => "blog", "count" => 0, "rule" => "typedetect_match");
-		
-	}
-	
 	//sql injection
 	$tag_injection = "SELECT tag_type, GROUP_CONCAT(tag_word SEPARATOR ',') AS tag_words, GROUP_CONCAT(tag_subtype SEPARATOR ',') AS tag_subtype, COUNT(*) AS tag_count, tag_latitude, tag_longitude FROM dictionary WHERE (";
 	$tag_duplicates = array();
@@ -108,37 +104,9 @@ function tags_produce($text) {
 
 	}
 	
-	if ($costs_total > 10) {
-		$tags_added[] = "product";				
-		$tags_output[] = array("tag" => "product", "count" => 0, "rule" => "price_match");
-		
-	}
-	
 	if (max($costs_array) > 250) {
 		$tags_added[] = "luxury";		
 		$tags_output[] = array("tag" => "luxury", "count" => 0, "rule" => "price_match");
-		
-	}
-	
-	if (in_array("product", $tags_added)) {
-		$product_male = array('male', 'males', 'man', 'men', 'mens', 'boy', 'boys');
-		$product_female = array('female', 'woman', 'womans', 'women', 'females' , 'girl', 'girls');	
-		foreach ($text_explode as $words) {
-			if (in_array(strtolower($words), $product_male)) $product_gender = "male";
-			if (in_array(strtolower($words), $product_female)) $product_gender = "female";				
-			
-		}
-		
-		if ($product_gender == "male") {
-			$tags_added[] = "male";		
-			$tags_output[] = array("tag" => "male", "count" => 0, "rule" => "gender_match");
-			
-		}
-		else if ($product_gender == "female") {
-			$tags_added[] = "female";		
-			$tags_output[] = array("tag" => "female", "count" => 0, "rule" => "gender_match");
-			
-		}
 		
 	}
 	
@@ -204,10 +172,13 @@ function tags_produce($text) {
 	//names 
 	$names_tags = array();
 	$names_exclude = tags_exclude();
+	$tags_names_output = array();
 	foreach (array_count_values(reset($names_output)) as $name => $count) {
 		if ($count > $tag_minimum_count && !in_array(strtolower($name), $names_exclude)) $names_tags[] = $name;
 		
 	}
+	
+	//count names
 	
 	if (count($tags_output) == 0) $tags_output = array();
 			
@@ -224,13 +195,16 @@ function tags_produce($text) {
 	if ($request_exists == 0) $tags_uploaded = tags_upload($tags_nonexistant, $tags_output[0]['tag']);
 	$tags_requested = tags_requested($text_format, $tags_added);
 			
-	return array("total_words" => $text_word_count, "positivity_rating" => $tags_rating_positivity, "nsfw_score" => $tags_rating_expletive, "relevant_tags" => $tags_output, "added_tags" => $tags_uploaded, 'total_tags' => count($tags_output), "names" => $names_output[0]);
+	return array("total_words" => $text_word_count, "positivity_rating" => $tags_rating_positivity, "nsfw_score" => $tags_rating_expletive, "relevant_tags" => $tags_output, "added_tags" => $tags_uploaded, 'total_tags' => count($tags_output), "names" => $names_output[0], "locations" => $tags_match_locations);
 	
 }
 
 function tags_requested($text, $tags) {
 	global $database_grado_connect;
-	
+	global $session_application;
+	global $session_ip;
+	global $session_country;
+			
 	$request_tags = implode(",", $tags);
 	$request_post = mysqli_query($database_grado_connect, "INSERT INTO `gradtag`.`requests` (`request_id`, `request_timestamp`, `request_body`, `request_tags`, `request_app`, `request_ip`, `request_country`) VALUES (NULL, CURRENT_TIMESTAMP, '$text', '$request_tags', '$session_application', '$session_ip', '$session_country');");
 	
@@ -268,7 +242,7 @@ function tags_rating($text) {
 	while($row = mysqli_fetch_array($rating_query)) {
 		if ($row['tag_type'] == "positive")	$rating_positive = $row['tag_count'];
 		else if ($row['tag_type'] == "negative") $rating_negative = $row['tag_count'];
-		else if ($row['tag_type'] == "expletive") $rating_expletive_count = $row['tag_count'];
+		else if ($row['tag_type'] == "expletive") $rating_expletive_count = (int)$row['tag_count'];
 		
 	}
 	
@@ -286,6 +260,7 @@ function tag_rules($catgory, $subcatagorys, $tags, $typecount, $existing) {
 	elseif ($catgory == "food") $tags_rule = array("subtype", "tag");		
 	elseif ($catgory == "country") $tags_rule = array("subtype", "tag");
 	elseif ($catgory == "animals") $tags_rule = array("subtype", "type");
+	elseif ($catgory == "country") $tags_rule = array("tag", "subtype");	
 	else $tags_rule = array("type", "subtype");
 		
 	if (in_array("type", $tags_rule) && $typecount > 1) {
