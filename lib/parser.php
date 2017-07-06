@@ -37,7 +37,6 @@ function parse_data($url, $message) {
 		$url_icon = "";
 				
 	}
-/*	
 	elseif (str_replace("www.", "", $url_components['host']) == "itunes.apple.com") {
 		$url_api = "https://itunes.apple.com/lookup?id=" . str_replace("id", "", end(explode("/", $url_components['path'])));	
 		$url_context = stream_context_create(array('http' => array('timeout' => 45)));		
@@ -60,7 +59,6 @@ function parse_data($url, $message) {
 		}
 						
 	}
-*/	
 	elseif (str_replace("www.", "", $url_components['host']) == "youtube.com" || str_replace("www.", "", $url_components['host']) == "youtu.be") {
 		preg_match("/^.*(youtu.be\/|v\/|embed\/|watch\?|youtube.com\/user\/[^#]*#([^\/]*?\/)*)\??v?=?([^#\&\?]*).*/", $url, $url_id);
 	
@@ -82,12 +80,6 @@ function parse_data($url, $message) {
 		$url_icon = "";
 						
 	}
-	
-	elseif (str_replace("www.", "", $url_components['host']) == "flickr.comsdadasdadasdsadasdasdasdad") {		
-		$query = "http://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=" . API_KEY . "&photo_id=" . $photoid . "&format=json&nojsoncallback=1";
-		
-	}
-	
 	elseif (str_replace("www.", "", $url_components['host']) == "vine.co") {		
 		$url_contents = download_web_content($url);			
 		
@@ -121,32 +113,6 @@ function parse_data($url, $message) {
 		$url_icon = "";
 		
 	}
-	
-	elseif (str_replace("www.", "", $url_components['host']) == "vimeo.comsdadasdadasdsadasdasdasdad") {		
-		//preg_match('#document\.getElementById\(\'player_(.+)\n#i', file_get_contents($url), $media_script);	
-		//preg_match('#"timestamp":([0-9]+)#i', $media_script[1], $timestamp_match);
-   	 	//preg_match('#"signature":"([a-z0-9]+)"#i', $media_script[1], $signature_match);
-		
-		//preg_match("/(https?:\/\/)?(www\.)?(player\.)?vimeo\.com\/([a-z]*\/)*([0-9]{6,11})[?]?.*/", $url, $url_id);
-		//preg_match_all("/(#\w+)/", $url_contents[0]->description, $url_hashtags);
-				
-		$url_api = "https://vimeo.com/api/v2/video/" . end($url_id) . ".json";	
-		$url_context = stream_context_create(array('http' => array('timeout' => 45)));		
-		$url_contents = json_decode(file_get_contents($url_api, false, $url_context));
-	
-		$url_hashtags = str_replace("#", "", implode(",", reset($url_hashtags)));
-		$url_title = $url_contents[0]->title;
-		$url_description = $url_contents[0]->description;
-		$url_image[] = $url_contents[0]->thumbnail_large;
-		$url_key = $url_contents[0]->id;
-		$url_media = "http://player.vimeo.com/play_redirect?clip_id=" . $url_id . "&sig=" . $signature_match[0] . '&time=' . $timestamp_match[0] . "&quality=sd";
-		$url_tags = implode(",", explode(",", str_replace(" ", "", $url_contents[0]->tags))) . "," . $url_hashtags;
-		$url_site = "vimeo.com";		
-		$url_type = "video";
-		$url_icon = "";
-					
-	}
-	
 	elseif (str_replace("www.", "", $url_components['host']) == "media.giphy.com" || str_replace("www.", "", $url_components['host']) == "giphy.com") {
 		$url_contents = download_web_content($url);
 		$url_metatags = output_meta($url_contents);
@@ -172,7 +138,6 @@ function parse_data($url, $message) {
 		if (empty($url_image)) $url_image[] = $url;
 		
 	}
-	
 	elseif (str_replace("www.", "", $url_components['host']) == "imgur.com" || str_replace("www.", "", $url_components['host']) == "i.imgur.com" || str_replace("www.", "", $url_components['host']) == "m.imgur.com") {			
 		$url_contents = download_web_content($url);
 				
@@ -191,51 +156,6 @@ function parse_data($url, $message) {
 		$url_icon = "";
 		
 	}
-	
-	elseif (str_replace("www.", "", $url_components['host']) == "dribbble.com") {			
-		preg_match("/(?<=dribbble.com\/shots\/).{7}/", $url, $url_id);
-		
-		$url_api = "https://api.dribbble.com/v1/shots/" . end($url_id) . "?access_token=83b66354dbc16b5eb2e2e162249f2c640fba9598e9cd687c3b908efbb9955f8c";	
-		$url_context = stream_context_create(array('http' => array('timeout' => 45)));		
-		$url_contents = json_decode(file_get_contents($url_api, false, $url_context));
-		
-		preg_match_all("/(#\w+)/", $url_contents->description, $url_hashtags);
-		
-		$url_hashtags = str_replace("#", "", implode(",", reset($url_hashtags)));
-		$url_title = $url_contents->title;
-		$url_description = $url_contents->description;
-		if (array_key_exists('hidpi', $url_contents->images) && isset($url_contents->images->hidpi)) $url_image[] = $url_contents->images->hidpi;
-		else $url_image[] = $url_contents->images->normal;
-		$url_key = end($url_id);
-		$url_media = "";
-		$url_tags = implode(",", $url_contents->tags) . ",design";
-		$url_site = "dribbble.com";			
-		$url_type = "image";
-		$url_icon = "";
-				
-	}
-	
-	elseif (str_replace("www.", "", $url_components['host']) == "imdb.com") {			
-		preg_match("/tt\\d{7}/", $url, $url_id);
-			
-		$url_api = "http://www.omdbapi.com/?i=" . end($url_id) . "&plot=full&r=json";	
-		$url_context = stream_context_create(array('http' => array('timeout' => 45)));		
-		$url_contents = json_decode(file_get_contents($url_api, false, $url_context));
-		
-		$url_title = $url_contents->Title . " (" . $url_contents->Year . ")";
-		$url_description = $url_contents->Plot;
-		$url_image[] = $url_contents->Poster;
-		$url_key = end($url_id);
-		$url_media = "";
-		$url_talent = $url_contents->Director . ", " . $url_contents->Actors . ", " . $url_contents->Writer;
-		$url_tags = str_replace(" ", "", $url_title) . "," .  str_replace(" ", "", $url_contents->Genre) . "," . $url_contents->Type . "," . str_replace(" ", "", $url_talent);
-		$url_site = $url_components['host'];
-		$url_type = "video";
-		$url_icon = "";
-		$url_hashtags = "";		
-				
-	}
-	
 	if (empty($url_type)) {
 		$url_file = pathinfo($url);
 		$url_imagefiles = array("png", "jpg", "jpeg", "tiff", "gif");
@@ -253,26 +173,13 @@ function parse_data($url, $message) {
 			$url_icon = "";
 			
 		}
-		/*
-		elseif (in_array($url_file['extension'], $url_videofiles)) {
-			$url_api = "";				
-			$url_title = "";
-			$url_description = "";
-			$url_image = "";
-			$url_key = "";
-			$url_media = $url;
-			$url_tags = "video";
-			$url_site = $url_components['host'];
-			$url_type = "video";
-			
-		}*/
 		else {
 			$url_contents = download_web_content($url);
 			
 		  	preg_match('/<title>(.*)<\/title>/', $url_contents, $match_title);
 			preg_match_all('/<link[^>]+(?:rel)=\"([^\"]*)\"[^>]+href=\"([^\"]*)\"[^>]*>/', $url_contents, $match_links);
 		   	preg_match_all('/<img[^>]+src=([\'"])?((?(1).+?|[^\s>]+))(?(1)\1)/', $url_contents, $match_images);
-		 	preg_match_all('/(?<=src=\"(https://|http://|)(www.|)youtube.com/(embed|watch?v=|?v=){11}/', $url_contents, $match_videos);
+		 	//preg_match_all('/(?<=src=\"(https://|http://|)(www.|)youtube.com/(embed|watch?v=|?v=){11}/', $url_contents, $match_videos);
 				
 			$url_title = $match_title[1];
 			$url_metatags = output_meta($url_contents);

@@ -127,7 +127,7 @@ if ($passed_method == 'POST') {
 						
 					}
 					else {
-						$json_status = 'access token not be created - ' . mysql_error();
+						$json_status = 'access token not be created - ' . mysqli_error($user_output);
 						$json_output[] = array('status' => $json_status, 'error_code' => 400);
 						echo json_encode($json_output);
 						exit;
@@ -136,7 +136,7 @@ if ($passed_method == 'POST') {
 					
 				}
 				else {
-					$json_status = 'user could not be created - ' . mysql_error();
+					$json_status = 'user could not be created - ' . mysqli_error($user_create);
 					$json_output[] = array('status' => $json_status, 'error_code' => 400);
 					echo json_encode($json_output);
 					exit;

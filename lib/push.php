@@ -37,7 +37,7 @@ function sent_push_to_user($user, $payload) {
 
 function sent_push_to_tag($tag, $payload, $title) {
 	$push_url = 'https://api.pushbots.com/push/all';
-	$push_content = array('platform' => array('0', '1'), 'token' => $token, 'tag' => $tag, 'badge' => '+1', 'msg' => $title, 'payload' => $payload);
+	$push_content = array('platform' => array('0', '1'), 'token' => $token, 'tags' => $tag, 'badge' => '+1', 'msg' => $title, 'payload' => $payload);
 	$push_return = 	pushbots($push_url, $push_content, "POST");
 		
 	return $push_return;

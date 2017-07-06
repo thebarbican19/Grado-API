@@ -1,9 +1,9 @@
-<?
+<?php
 
 header("Content-type: application/json; charset=utf-8");
 
-$database_grado_connect = mysqli_connect('localhost', 'phpmyadmin', '6DvPEpvwZLRcqj'); 
-//$database_grado_connect = mysqli_connect('localhost', 'root', 'root'); 
+//$database_grado_connect = mysqli_connect('localhost', 'phpmyadmin', '6DvPEpvwZLRcqj'); 
+$database_grado_connect = mysqli_connect('localhost', 'root', 'root'); 
 if (!$database_grado_connect) { 
 	header('HTTP/ 400 HOST ERROR', true, 400);
 		

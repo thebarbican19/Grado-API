@@ -253,9 +253,9 @@ function tags_rating($text) {
 }
 
 function tag_rules($catgory, $subcatagorys, $tags, $typecount, $existing) {
-	if ($catgory == "colors") $tags_rule = array("subtype");
+	if ($catgory == "colors") $tags_rule = array();
 	elseif ($catgory == "space") $tags_rule = array("type", "subtype");
-	elseif ($catgory == "clothing") $tags_rule = array("tag", "subtype", "type");
+	elseif ($catgory == "clothing") $tags_rule = array("subtype", "type");
 	elseif ($catgory == "health") $tags_rule = array("subtype", "type");	
 	elseif ($catgory == "food") $tags_rule = array("subtype", "tag");		
 	elseif ($catgory == "country") $tags_rule = array("subtype", "tag");
@@ -264,8 +264,8 @@ function tag_rules($catgory, $subcatagorys, $tags, $typecount, $existing) {
 	else $tags_rule = array("type", "subtype");
 		
 	if (in_array("type", $tags_rule) && $typecount > 1) {
-		$rules_output[] = array("tag" => $catgory, "count" => (int)$typecount, "rule" => "dict_match");
-		
+		$rules_output[] = array("tag" => $catgory, "count" => (int)$typecount, "rule" => "dict_match_catagory", "type" => $catagory);
+				
 	}
 	
 	if (in_array("subtype", $tags_rule)) {
@@ -276,7 +276,7 @@ function tag_rules($catgory, $subcatagorys, $tags, $typecount, $existing) {
 		
 		foreach (array_count_values($tags_match_subtype_added) as $subtype => $count) {
 			if ($count > 1 && strlen($subtype) > 2) {
-				$rules_output[] = array("tag" => $subtype, "count" => (int)$count, "rule" => "dict_match");
+				$rules_output[] = array("tag" => $subtype, "count" => (int)$count, "rule" => "dict_match", "type" => $catagory);
 				
 			}
 				
@@ -292,7 +292,7 @@ function tag_rules($catgory, $subcatagorys, $tags, $typecount, $existing) {
 		
 		foreach (array_count_values($tags_match_tag_added) as $tag => $count) {
 			if ($count > 0 && strlen($tag) > 2) {
-				$rules_output[] = array("tag" => $tag, "count" => (int)$count, "rule" => "dict_match");
+				$rules_output[] = array("tag" => $tag, "count" => (int)$count, "rule" => "dict_match", "type" => $catagory);
 				
 			}
 				
